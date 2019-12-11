@@ -1,59 +1,43 @@
-var mergedGeometry = new THREE.Geometry();
-function start(){
+var resolution = 4;
+var oldRes = 4;
+var scene = new THREE.Scene();
+
+//translate keypress events to strings
+//from http://javascript.info/tutorial/keyboard-events
+function getChar(event) {
+	if (event.which == null) {
+	 return String.fromCharCode(event.keyCode) // IE
+	} else if (event.which!=0 && event.charCode!=0) {
+	 return String.fromCharCode(event.which)   // the rest
+	} else {
+	 return null // special key
+	}
+	}
 	
-
-    var h = window.innerHeight;
-    var w = window.innerWidth;
-
-    var aspectRatio = w/h;
-    var fieldOfView = 30;
-    var nearPlane = 0.1;
-    var farPlane = 1000;
-
-    var ourCanvas = document.getElementById('theCanvas');
-    var renderer = new THREE.WebGLRenderer({canvas: ourCanvas, alpha: true, antialias: true});
-    document.body.appendChild(renderer.domElement)
-    renderer.setSize(w,h);
-
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera( fieldOfView, aspectRatio, nearPlane, farPlane );
-    camera.position.x = 2;
-    camera.position.y = 2;
-    camera.position.z = 5;
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
-
-    //Camera controls
-    var controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.update();
-
-
-    //OBEJCTS below
-
-    //light
-    var light = new THREE.AmbientLight(0xfffffffff, .8);
-    scene.add(light);
-
-    //backlight
-    var backLight = new THREE.DirectionalLight(0xfffffffff, .2);
-    backLight.position.set(-100, 200, 50);
-    scene.add(backLight);
-
-    //cube
-	generateChunk(scene, 5);
-	// cube(scene, 1,0,0);
-	// cube(scene, 2,0,0);
-	// cube(scene, 3,0,0);
-
-    
-    var render = function(){
-        requestAnimationFrame(render);
-        //put code here
-        renderer.render(scene, camera);
-    };
-    render();
-}
+	//handler for key press events will choose which axis to
+	// rotate around
+	function handleKeyPress(event)
+	{
+		var ch = getChar(event);
+		switch(ch)
+		{
+			case '+':
+				oldRes = resolution;
+				resolution ++;
+				break;
+			case '-':
+				oldRes = resolution;
+				resolution --;
+				break;
+		}
+	
+	}
 
 function generateChunk(scene, resolution){
+	for (let i = scene.children.length - 1; i >= 0; i--) {
+		if(scene.children[i].type === "Mesh")
+			scene.remove(scene.children[i]);
+	}
 	for(var i = 0; i < resolution; i++){
 		for(var j = 0; j < resolution; j ++){
 			for(var k = 0; k < resolution; k ++){
@@ -96,7 +80,7 @@ function cube(scene, x, y, z){
     if (chunkCornerCoords[6].w == isoLevel) cubeIndex |= 64;
     if (chunkCornerCoords[7].w == isoLevel) cubeIndex |= 128;
 
-    console.log(cubeIndex)
+    // console.log(cubeIndex)
 
     var e = triTable;
     var triangleTable = makeBetterTriangleTable(e);
@@ -189,6 +173,61 @@ function makeBetterTriangleTable(array){
 
 function InitChunk(){
 
+}
+
+function main(){
+	
+	window.onkeypress = handleKeyPress;
+
+    var h = window.innerHeight;
+    var w = window.innerWidth;
+
+    var aspectRatio = w/h;
+    var fieldOfView = 30;
+    var nearPlane = 0.1;
+    var farPlane = 1000;
+
+    var ourCanvas = document.getElementById('theCanvas');
+    var renderer = new THREE.WebGLRenderer({canvas: ourCanvas, alpha: true, antialias: true});
+    document.body.appendChild(renderer.domElement)
+    renderer.setSize(w,h);
+
+    var camera = new THREE.PerspectiveCamera( fieldOfView, aspectRatio, nearPlane, farPlane );
+    camera.position.x = 2;
+    camera.position.y = 2;
+    camera.position.z = 5;
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    //Camera controls
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.update();
+
+
+    //OBEJCTS below
+
+    //light
+    var light = new THREE.AmbientLight(0xfffffffff, .8);
+    scene.add(light);
+
+    //backlight
+    var backLight = new THREE.DirectionalLight(0xfffffffff, .2);
+    backLight.position.set(-100, 200, 50);
+    scene.add(backLight);
+
+    //cube
+	generateChunk(scene, resolution);
+
+    
+    var render = function(){
+		if(oldRes !== resolution){
+			oldRes = resolution;
+			generateChunk(scene, resolution);
+		}
+        requestAnimationFrame(render);
+        //put code here
+        renderer.render(scene, camera);
+    };
+	render();
 }
 
 var triTable = new Int32Array( [
