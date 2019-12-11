@@ -1,6 +1,5 @@
-var mergedGeometry = new THREE.Geometry();
+
 function start(){
-	
 
     var h = window.innerHeight;
     var w = window.innerWidth;
@@ -39,8 +38,8 @@ function start(){
     scene.add(backLight);
 
     //cube
-	generateChunk(scene, 5);
-	// cube(scene, 1,0,0);
+	//generateChunk(scene, 5);
+	cube(scene, 1,0,0);
 	// cube(scene, 2,0,0);
 	// cube(scene, 3,0,0);
 
@@ -55,25 +54,21 @@ function start(){
 
 function generateChunk(scene, resolution){
 	for(var i = 0; i < resolution; i++){
-		for(var j = 0; j < resolution; j ++){
-			for(var k = 0; k < resolution; k ++){
-				cube(scene, i, k, j);
-			}
-		}
+		//cube(scene, i, i, i);
 	}
 }
 
 function cube(scene, x, y, z){
 	var chunkGeometry = new THREE.BoxGeometry(0, 0, 0);
 	var wireframe = new THREE.WireframeGeometry(chunkGeometry);
-    var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 0 } );
+    var mat = new THREE.LineBasicMaterial( { color: 0xffffff, linewidth: 1 } );
     var chunk = new THREE.LineSegments(wireframe, mat);
     chunk.material.depthTest = false;
     chunk.material.opacity = 0.25;
 	chunk.material.transparent = true;
 	chunk.position.set(x, y, z);
 	var chunkCornerCoords = chunkGeometry.vertices;
-	// scene.add(chunk);	
+	scene.add(chunk);	
 	
 	//console.log(chunkCornerCoords);
 
@@ -104,6 +99,15 @@ function cube(scene, x, y, z){
     //console.log(triangleTable[93]);
 
 	var edges = generateEdgesCoordArray(chunkGeometry.vertices);
+	
+	drawDot(scene, chunkCornerCoords[0]);
+	drawDot(scene, chunkCornerCoords[1]);
+	drawDot(scene, chunkCornerCoords[2]);
+	drawDot(scene, chunkCornerCoords[3]);
+	drawDot(scene, chunkCornerCoords[4]);
+	drawDot(scene, chunkCornerCoords[5]);
+	drawDot(scene, chunkCornerCoords[6]);
+	drawDot(scene, chunkCornerCoords[7]);
 
 
     //console.log(edges)
@@ -125,7 +129,8 @@ function cube(scene, x, y, z){
 
     var triGeometery = new THREE.BufferGeometry();
 
-	var cornerVertices = new Float32Array(edgeVertices);
+	console.log(edgeVertices);
+    var cornerVertices = new Float32Array(edgeVertices);
  
     //var vertices = new Float32Array(triangleTable[cubeIndex]);
     triGeometery.setAttribute( 'position', new THREE.BufferAttribute( cornerVertices, 3 ) );
@@ -134,6 +139,7 @@ function cube(scene, x, y, z){
     var triMesh = new THREE.Mesh(triGeometery, material);
 
 	triMesh.material.side = THREE.DoubleSide;
+
 	scene.add(triMesh);    
 }
 
