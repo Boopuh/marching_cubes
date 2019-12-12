@@ -1,10 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com
- * @author chaht01 / http://hyuntak.com
- * Port of http://webglsamples.org/blob/blob.html
- */
-
 import {
 	BufferAttribute,
 	BufferGeometry,
@@ -12,6 +5,8 @@ import {
 	ImmediateRenderObject,
 	NoColors
 } from "../../../build/three.module.js";
+
+
 
 var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
@@ -69,18 +64,6 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
 		this.positionArray = new Float32Array( this.maxCount * 3 );
 		this.normalArray = new Float32Array( this.maxCount * 3 );
-
-		if ( this.enableUvs ) {
-
-			this.uvArray = new Float32Array( this.maxCount * 2 );
-
-		}
-
-		if ( this.enableColors ) {
-
-			this.colorArray = new Float32Array( this.maxCount * 3 );
-
-		}
 
 	};
 
@@ -502,37 +485,6 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
 		var sign = Math.sign( strength );
 		strength = Math.abs( strength );
-		var userDefineColor = ! ( colors === undefined || colors === null );
-		var ballColor = new Color( ballx, bally, ballz );
-		if ( userDefineColor ) {
-
-			try {
-
-				ballColor =
-					colors instanceof Color
-						? colors
-						: Array.isArray( colors )
-							? new Color(
-								Math.min( Math.abs( colors[ 0 ] ), 1 ),
-								Math.min( Math.abs( colors[ 1 ] ), 1 ),
-								Math.min( Math.abs( colors[ 2 ] ), 1 )
-						  )
-							: new Color( colors );
-
-			} catch ( err ) {
-
-				ballColor = new Color( ballx, bally, ballz );
-
-			}
-
-		}
-
-		// Let's solve the equation to find the radius:
-		// 1.0 / (0.000001 + radius^2) * strength - subtract = 0
-		// strength / (radius^2) = subtract
-		// strength = subtract * radius^2
-		// radius^2 = strength / subtract
-		// radius = sqrt(strength / subtract)
 
 		var radius = this.size * Math.sqrt( strength / subtract ),
 			zs = ballz * this.size,
@@ -540,17 +492,17 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 			xs = ballx * this.size;
 
 		var min_z = Math.floor( zs - radius );
-		if ( min_z < 1 ) min_z = 1;
+		//if ( min_z < 1 ) min_z = 1;
 		var max_z = Math.floor( zs + radius );
-		if ( max_z > this.size - 1 ) max_z = this.size - 1;
+		//if ( max_z > this.size - 1 ) max_z = this.size - 1;
 		var min_y = Math.floor( ys - radius );
-		if ( min_y < 1 ) min_y = 1;
+		//if ( min_y < 1 ) min_y = 1;
 		var max_y = Math.floor( ys + radius );
-		if ( max_y > this.size - 1 ) max_y = this.size - 1;
+		//if ( max_y > this.size - 1 ) max_y = this.size - 1;
 		var min_x = Math.floor( xs - radius );
-		if ( min_x < 1 ) min_x = 1;
+		//if ( min_x < 1 ) min_x = 1;
 		var max_x = Math.floor( xs + radius );
-		if ( max_x > this.size - 1 ) max_x = this.size - 1;
+		//if ( max_x > this.size - 1 ) max_x = this.size - 1;
 
 		// Don't polygonize in the outer layer because normals aren't
 		// well-defined there.
@@ -576,16 +528,6 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
 						this.field[ y_offset + x ] += val * sign;
 
-						// optimization
-						// http://www.geisswerks.com/ryan/BLOBS/blobs.html
-						const ratio =
-							Math.sqrt( ( x - xs ) * ( x - xs ) + ( y - ys ) * ( y - ys ) + ( z - zs ) * ( z - zs ) ) / radius;
-						const contrib =
-							1 - ratio * ratio * ratio * ( ratio * ( ratio * 6 - 15 ) + 10 );
-						this.palette[ ( y_offset + x ) * 3 + 0 ] += ballColor.r * contrib;
-						this.palette[ ( y_offset + x ) * 3 + 1 ] += ballColor.g * contrib;
-						this.palette[ ( y_offset + x ) * 3 + 2 ] += ballColor.b * contrib;
-
 					}
 
 				}
@@ -596,7 +538,7 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
 	};
 
-
+	
 	this.addPlaneY = function ( strength, subtract ) {
 
 		var x,y,z,yy,val,ydiv,cy,cxy,
@@ -607,6 +549,7 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 			field = this.field,
 			dist = size * Math.sqrt( strength / subtract );
 
+			//console.log("size", size, "yd", yd, "zd", zd, "field", field, "dist", dist);
 		if ( dist > size ) dist = size;
 
 		for ( y = 0; y < dist; y ++ ) {
@@ -623,7 +566,10 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
 					cxy = cy + x;
 
-					for ( z = 0; z < size; z ++ ) field[ zd * z + cxy ] += val;
+					for ( z = 0; z < size; z ++ ) {
+						
+						field[ zd * z + cxy ] += val;
+					}
 
 				}
 

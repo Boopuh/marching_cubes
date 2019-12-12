@@ -19,7 +19,7 @@
 
 		import Stats from './jsm/libs/stats.module.js';
 
-		import { GUI } from './jsm/libs/dat.gui.module.js';
+		//import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
 		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from './jsm/shaders/ToonShader.js';
@@ -32,7 +32,8 @@
 
 		var light, ambientLight;
 
-		var effect, resolution;
+		var effect;
+		var resolution;
 
 		var seed = Math.random();
 
@@ -73,7 +74,7 @@
 
 			// MARCHING CUBES
 
-			resolution = 100;
+			resolution = 28;
 
 			effect = new MarchingCubes( resolution, current_material, true, true );
 			effect.position.set( 0, 0, 0 );
@@ -97,26 +98,12 @@
 
 			container.appendChild( renderer.domElement );
 
-			// CONTROLS
-
 			var controls = new OrbitControls( camera, renderer.domElement );
-
-			// STATS
 
 			stats = new Stats();
 			container.appendChild( stats.dom );
 
-			// GUI
-
-			setupGui();
-
-			// EVENTS
-
 			window.addEventListener( 'resize', onWindowResize, false );
-
-
-			
-
 		}
 
 		//
@@ -130,85 +117,7 @@
 
 		}
 
-		function createShaderMaterial( shader, light, ambientLight ) {
-
-			var u = THREE.UniformsUtils.clone( shader.uniforms );
-
-			var vs = shader.vertexShader;
-			var fs = shader.fragmentShader;
-
-			var material = new THREE.ShaderMaterial( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
-
-			material.uniforms[ "uDirLightPos" ].value = light.position;
-			material.uniforms[ "uDirLightColor" ].value = light.color;
-
-			//material.uniforms[ "uAmbientLightColor" ].value = ambientLight.color;
-
-			return material;
-
-		}
-
-		//
-
-		function setupGui() {
-
-			var createHandler = function ( id ) {
-
-				return function () {
-
-					var mat_old = materials[ current_material ];
-					mat_old.h = m_h.getValue();
-					mat_old.s = m_s.getValue();
-					mat_old.l = m_l.getValue();
-
-					current_material = id;
-
-					var mat = materials[ id ];
-					effect.material = mat.m;
-
-					m_h.setValue( mat.h );
-					m_s.setValue( mat.s );
-					m_l.setValue( mat.l );
-
-					effect.enableUvs = ( current_material === "textured" ) ? true : false;
-					effect.enableColors = ( current_material === "colors" || current_material === "multiColors" ) ? true : false;
-
-				};
-
-			};
-
-			effectController = {
-
-				//material: "shiny",
-
-				speed: 1.0,
-				numBlobs: 10,
-				resolution: 28,
-				isolation: 80,
-
-				floor: true,
-				wallx: false,
-				wallz: false,
-
-				hue: 0.0,
-				saturation: 0.0,
-				lightness: 1.0,
-
-				lx: 0.5,
-				ly: 0.5,
-				lz: 1.0,
-
-				dummy: function () {}
-
-			};
-
-			var h, m_h, m_s, m_l;
-
-			var gui = new GUI();
-		}
-
 		// this controls content of marching cubes voxel field
-
 		function updateCubes( object, time, numblobs, floor ) {
 
 			object.reset();
@@ -218,12 +127,15 @@
 			var i, ballx, bally, ballz, subtract, strength;
 			subtract = 12;
 			strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );
+			//console.log(strength)
 
 			for ( i = 0; i < numblobs; i ++ ) {
 
-				ballx = Math.cos( i + 1.26 * time * ( 1.03 + 0.5 * Math.cos( 0.21 * i ) ) ) * 0.27 + 0.5;
+				ballx = Math.cos( i + 1.26 * time * ( 1.03 + 0.5 * Math.cos( 0.21 * i ) ) ) * 0.27;
 				bally = seed;
 				ballz = Math.cos( i + 1.32 * time * 0.1 * Math.sin( ( 0.92 + 0.53 * i ) ) ) * 0.27 + 0.5;
+
+				//console.log(ballx)
 
 				object.addBall( ballx, bally, ballz, strength, subtract );
 
@@ -250,7 +162,7 @@
 
 			time = seed;
 			if(seed > .35){
-				seed = .3
+				seed = .2
 			}
 			else{
 				seed = seed;
@@ -258,23 +170,10 @@
 
 			// marching cubes
 
-			if ( effectController.resolution !== resolution ) {
-
-				resolution = effectController.resolution;
-				effect.init( Math.floor( resolution ) );
-
-			}
-
-			if ( effectController.isolation !== effect.isolation ) {
-
-				effect.isolation = effectController.isolation;
-
-			}
-
-			updateCubes( effect, time, effectController.numBlobs, effectController.floor );
+			updateCubes( effect, time, 30, true );
 
 			// materials
-			effect.material.color.setHSL( effectController.hue, effectController.saturation, effectController.lightness );
+			effect.material.color.setHSL( 0, 0, 1.0 );
 			// lights
 
 

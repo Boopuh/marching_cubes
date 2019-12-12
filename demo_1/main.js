@@ -33,8 +33,8 @@ function start(){
     scene.add(light);
 
     //backlight
-    var backLight = new THREE.DirectionalLight(0xfffffffff, .2);
-    backLight.position.set(-100, 200, 50);
+    var backLight = new THREE.DirectionalLight(0xfffffffff, 1.0);
+    backLight.position.set(1.0, 1.0, 1.0);
     scene.add(backLight);
 
     //cube
@@ -99,15 +99,11 @@ function cube(scene, x, y, z){
     //console.log(triangleTable[93]);
 
 	var edges = generateEdgesCoordArray(chunkGeometry.vertices);
+
+	for(var i = 0; i < 8; i++){
+		drawDot(scene, chunkCornerCoords[i], 0xffff00);
+	}
 	
-	drawDot(scene, chunkCornerCoords[0]);
-	drawDot(scene, chunkCornerCoords[1]);
-	drawDot(scene, chunkCornerCoords[2]);
-	drawDot(scene, chunkCornerCoords[3]);
-	drawDot(scene, chunkCornerCoords[4]);
-	drawDot(scene, chunkCornerCoords[5]);
-	drawDot(scene, chunkCornerCoords[6]);
-	drawDot(scene, chunkCornerCoords[7]);
 
 
     //console.log(edges)
@@ -135,7 +131,7 @@ function cube(scene, x, y, z){
     //var vertices = new Float32Array(triangleTable[cubeIndex]);
     triGeometery.setAttribute( 'position', new THREE.BufferAttribute( cornerVertices, 3 ) );
 
-    var material = new THREE.MeshLambertMaterial({color: 0xf3ffe2});
+    var material = new THREE.MeshLambertMaterial({color: 0xffffff});
     var triMesh = new THREE.Mesh(triGeometery, material);
 
 	triMesh.material.side = THREE.DoubleSide;
@@ -168,9 +164,9 @@ function generateEdgesCoordArray(vects){
     ]
 }
 
-function drawDot(scene, vec3){
+function drawDot(scene, vec3, color){
     var geometry = new THREE.SphereGeometry( .025, 32, 32 );
-    var material = new THREE.MeshLambertMaterial( {color: 0xffff00} );
+    var material = new THREE.MeshLambertMaterial( {color: color} );
     var sphere = new THREE.Mesh( geometry, material );
     sphere.position.x  = vec3.x;
     sphere.position.y = vec3.y;
