@@ -34,7 +34,7 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
 	this.init = function ( resolution ) {
 
-		this.resolution = resolution;
+		this.resolution = 50;
 
 		// parameters
 
@@ -424,57 +424,7 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 			scope.normalArray[ c + 6 ] = nx;
 			scope.normalArray[ c + 7 ] = ny;
 			scope.normalArray[ c + 8 ] = nz;
-
-		} else {
-
-			scope.normalArray[ c + 0 ] = norm[ o1 + 0 ];
-			scope.normalArray[ c + 1 ] = norm[ o1 + 1 ];
-			scope.normalArray[ c + 2 ] = norm[ o1 + 2 ];
-
-			scope.normalArray[ c + 3 ] = norm[ o2 + 0 ];
-			scope.normalArray[ c + 4 ] = norm[ o2 + 1 ];
-			scope.normalArray[ c + 5 ] = norm[ o2 + 2 ];
-
-			scope.normalArray[ c + 6 ] = norm[ o3 + 0 ];
-			scope.normalArray[ c + 7 ] = norm[ o3 + 1 ];
-			scope.normalArray[ c + 8 ] = norm[ o3 + 2 ];
-
-		}
-
-		// uvs
-
-		if ( scope.enableUvs ) {
-
-			var d = scope.count * 2;
-
-			scope.uvArray[ d + 0 ] = pos[ o1 + 0 ];
-			scope.uvArray[ d + 1 ] = pos[ o1 + 2 ];
-
-			scope.uvArray[ d + 2 ] = pos[ o2 + 0 ];
-			scope.uvArray[ d + 3 ] = pos[ o2 + 2 ];
-
-			scope.uvArray[ d + 4 ] = pos[ o3 + 0 ];
-			scope.uvArray[ d + 5 ] = pos[ o3 + 2 ];
-
-		}
-
-		// colors
-
-		if ( scope.enableColors ) {
-
-			scope.colorArray[ c + 0 ] = colors[ o1 + 0 ];
-			scope.colorArray[ c + 1 ] = colors[ o1 + 1 ];
-			scope.colorArray[ c + 2 ] = colors[ o1 + 2 ];
-
-			scope.colorArray[ c + 3 ] = colors[ o2 + 0 ];
-			scope.colorArray[ c + 4 ] = colors[ o2 + 1 ];
-			scope.colorArray[ c + 5 ] = colors[ o2 + 2 ];
-
-			scope.colorArray[ c + 6 ] = colors[ o3 + 0 ];
-			scope.colorArray[ c + 7 ] = colors[ o3 + 1 ];
-			scope.colorArray[ c + 8 ] = colors[ o3 + 2 ];
-
-		}
+		} 
 
 		scope.count += 3;
 
@@ -646,60 +596,10 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 
 	};
 
-	this.addPlaneX = function ( strength, subtract ) {
-
-		var x,
-			y,
-			z,
-			xx,
-			val,
-			xdiv,
-			cxy,
-			// cache attribute lookups
-			size = this.size,
-			yd = this.yd,
-			zd = this.zd,
-			field = this.field,
-			dist = size * Math.sqrt( strength / subtract );
-
-		if ( dist > size ) dist = size;
-
-		for ( x = 0; x < dist; x ++ ) {
-
-			xdiv = x / size;
-			xx = xdiv * xdiv;
-			val = strength / ( 0.0001 + xx ) - subtract;
-
-			if ( val > 0.0 ) {
-
-				for ( y = 0; y < size; y ++ ) {
-
-					cxy = x + y * yd;
-
-					for ( z = 0; z < size; z ++ ) {
-
-						field[ zd * z + cxy ] += val;
-
-					}
-
-				}
-
-			}
-
-		}
-
-	};
 
 	this.addPlaneY = function ( strength, subtract ) {
 
-		var x,
-			y,
-			z,
-			yy,
-			val,
-			ydiv,
-			cy,
-			cxy,
+		var x,y,z,yy,val,ydiv,cy,cxy,
 			// cache attribute lookups
 			size = this.size,
 			yd = this.yd,
@@ -724,125 +624,6 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 					cxy = cy + x;
 
 					for ( z = 0; z < size; z ++ ) field[ zd * z + cxy ] += val;
-
-				}
-
-			}
-
-		}
-
-	};
-
-	this.addPlaneZ = function ( strength, subtract ) {
-
-		var x,
-			y,
-			z,
-			zz,
-			val,
-			zdiv,
-			cz,
-			cyz,
-			// cache attribute lookups
-			size = this.size,
-			yd = this.yd,
-			zd = this.zd,
-			field = this.field,
-			dist = size * Math.sqrt( strength / subtract );
-
-		if ( dist > size ) dist = size;
-
-		for ( z = 0; z < dist; z ++ ) {
-
-			zdiv = z / size;
-			zz = zdiv * zdiv;
-			val = strength / ( 0.0001 + zz ) - subtract;
-			if ( val > 0.0 ) {
-
-				cz = zd * z;
-
-				for ( y = 0; y < size; y ++ ) {
-
-					cyz = cz + y * yd;
-
-					for ( x = 0; x < size; x ++ ) field[ cyz + x ] += val;
-
-				}
-
-			}
-
-		}
-
-	};
-
-	/////////////////////////////////////
-	// Updates
-	/////////////////////////////////////
-
-	this.setCell = function ( x, y, z, value ) {
-
-		var index = this.size2 * z + this.size * y + x;
-		this.field[ index ] = value;
-
-	};
-
-	this.getCell = function ( x, y, z ) {
-
-		var index = this.size2 * z + this.size * y + x;
-		return this.field[ index ];
-
-	};
-
-	this.blur = function ( intensity ) {
-
-		if ( intensity === undefined ) {
-
-			intensity = 1;
-
-		}
-
-		var field = this.field;
-		var fieldCopy = field.slice();
-		var size = this.size;
-		var size2 = this.size2;
-		for ( var x = 0; x < size; x ++ ) {
-
-			for ( var y = 0; y < size; y ++ ) {
-
-				for ( var z = 0; z < size; z ++ ) {
-
-					var index = size2 * z + size * y + x;
-					var val = fieldCopy[ index ];
-					var count = 1;
-
-					for ( var x2 = - 1; x2 <= 1; x2 += 2 ) {
-
-						var x3 = x2 + x;
-						if ( x3 < 0 || x3 >= size ) continue;
-
-						for ( var y2 = - 1; y2 <= 1; y2 += 2 ) {
-
-							var y3 = y2 + y;
-							if ( y3 < 0 || y3 >= size ) continue;
-
-							for ( var z2 = - 1; z2 <= 1; z2 += 2 ) {
-
-								var z3 = z2 + z;
-								if ( z3 < 0 || z3 >= size ) continue;
-
-								var index2 = size2 * z3 + size * y3 + x3;
-								var val2 = fieldCopy[ index2 ];
-
-								count ++;
-								val += intensity * ( val2 - val ) / count;
-
-							}
-
-						}
-
-					}
-
-					field[ index ] = val;
 
 				}
 
@@ -902,75 +683,6 @@ var MarchingCubes = function ( resolution, material, enableUvs, enableColors ) {
 		}
 
 		this.end( renderCallback );
-
-	};
-
-	this.generateGeometry = function () {
-
-		console.warn(
-			"MarchingCubes: generateGeometry() now returns BufferGeometry"
-		);
-		return this.generateBufferGeometry();
-
-	};
-
-	function concatenate( a, b, length ) {
-
-		var result = new Float32Array( a.length + length );
-		result.set( a, 0 );
-		result.set( b.slice( 0, length ), a.length );
-		return result;
-
-	}
-
-	this.generateBufferGeometry = function () {
-
-		var geo = new BufferGeometry();
-		var posArray = new Float32Array();
-		var normArray = new Float32Array();
-		var colorArray = new Float32Array();
-		var uvArray = new Float32Array();
-		var scope = this;
-
-		var geo_callback = function ( object ) {
-
-			if ( scope.hasPositions )
-				posArray = concatenate(
-					posArray,
-					object.positionArray,
-					object.count * 3
-				);
-			if ( scope.hasNormals )
-				normArray = concatenate(
-					normArray,
-					object.normalArray,
-					object.count * 3
-				);
-			if ( scope.hasColors )
-				colorArray = concatenate(
-					colorArray,
-					object.colorArray,
-					object.count * 3
-				);
-			if ( scope.hasUvs )
-				uvArray = concatenate( uvArray, object.uvArray, object.count * 2 );
-
-			object.count = 0;
-
-		};
-
-		this.render( geo_callback );
-
-		if ( this.hasPositions )
-			geo.setAttribute( "position", new BufferAttribute( posArray, 3 ) );
-		if ( this.hasNormals )
-			geo.setAttribute( "normal", new BufferAttribute( normArray, 3 ) );
-		if ( this.hasColors )
-			geo.setAttribute( "color", new BufferAttribute( colorArray, 3 ) );
-		if ( this.hasUvs )
-			geo.setAttribute( "uv", new BufferAttribute( uvArray, 2 ) );
-
-		return geo;
 
 	};
 
