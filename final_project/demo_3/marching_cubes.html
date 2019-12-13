@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-	<title>three.js webgl - marching cubes</title>
+	<title>marching cubes</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<link type="text/css" rel="stylesheet" href="main.css">
@@ -17,14 +18,11 @@
 	<script type="module">
 		import * as THREE from '../build/three.module.js';
 
-		import Stats from './jsm/libs/stats.module.js';
-
-		//import { GUI } from './jsm/libs/dat.gui.module.js';
 		import { OrbitControls } from './jsm/controls/OrbitControls.js';
 		import { MarchingCubes } from './jsm/objects/MarchingCubes.js';
 		import { ToonShader1, ToonShader2, ToonShaderHatching, ToonShaderDotted } from './jsm/shaders/ToonShader.js';
 
-		var container, stats;
+		var container;
 
 		var camera, scene, renderer;
 
@@ -47,63 +45,63 @@
 
 		function init() {
 
-			container = document.getElementById( 'container' );
+			container = document.getElementById('container');
 
 			// CAMERA
 
-			camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
-			camera.position.set( - 500, 500, 1500 );
+			camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+			camera.position.set(- 500, 500, 1500);
 
 			// SCENE
 
 			scene = new THREE.Scene();
-			scene.background = new THREE.Color( 0x050505 );
+			scene.background = new THREE.Color(0x050505);
 
 			// LIGHTS
-			light = new THREE.DirectionalLight( 0xffffff, 1.0);
-			light.position.set( 1.0, 1.0, 1.0 );
-			scene.add( light );
+			light = new THREE.DirectionalLight(0xffffff, 1.0);
+			light.position.set(1.0, 1.0, 1.0);
+			scene.add(light);
 
-			ambientLight = new THREE.AmbientLight( 0x080808 );
-			scene.add( ambientLight );
+			ambientLight = new THREE.AmbientLight(0x080808);
+			scene.add(ambientLight);
 
 			// MATERIALS
 
 			//materials = generateMaterials();
-			current_material = new THREE.MeshLambertMaterial( { color: 0x000000, flatShading: true } );
+			current_material = new THREE.MeshLambertMaterial({ color: 0x000000, flatShading: true });
 
 			// MARCHING CUBES
 
 			resolution = 28;
 
-			effect = new MarchingCubes( resolution, current_material, true, true );
-			effect.position.set( 0, 0, 0 );
-			effect.scale.set( 700, 700, 700 );
+			effect = new MarchingCubes(resolution, current_material, true, true);
+			effect.position.set(0, 0, 0);
+			effect.scale.set(700, 700, 700);
 
 			effect.enableUvs = false;
 			effect.enableColors = false;
 
-			scene.add( effect );
+			scene.add(effect);
 
 			// RENDERER
 
 			renderer = new THREE.WebGLRenderer();
 			renderer.gammaOutput = true;
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.setSize(window.innerWidth, window.innerHeight);
 
 			renderer.domElement.style.position = "absolute";
 			renderer.domElement.style.top = "0px";
 			renderer.domElement.style.left = "0px";
 
-			container.appendChild( renderer.domElement );
+			container.appendChild(renderer.domElement);
 
-			var controls = new OrbitControls( camera, renderer.domElement );
+			var controls = new OrbitControls(camera, renderer.domElement);
 
-			stats = new Stats();
-			container.appendChild( stats.dom );
+			//stats = new Stats();
+			//container.appendChild(stats.dom);
 
-			window.addEventListener( 'resize', onWindowResize, false );
+			window.addEventListener('resize', onWindowResize, false);
 		}
 
 		//
@@ -113,12 +111,12 @@
 			camera.aspect = window.innerWidth / window.innerHeight;
 			camera.updateProjectionMatrix();
 
-			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.setSize(window.innerWidth, window.innerHeight);
 
 		}
 
 		// this controls content of marching cubes voxel field
-		function updateCubes( object, time, numblobs, floor ) {
+		function updateCubes(object, time, numblobs, floor) {
 
 			object.reset();
 
@@ -126,33 +124,33 @@
 
 			var i, ballx, bally, ballz, subtract, strength;
 			subtract = 12;
-			strength = 1.2 / ( ( Math.sqrt( numblobs ) - 1 ) / 4 + 1 );
+			strength = 1.2 / ((Math.sqrt(numblobs) - 1) / 4 + 1);
 			//console.log(strength)
 
-			for ( i = 0; i < numblobs; i ++ ) {
+			for (i = 0; i < numblobs; i++) {
 
-				ballx = Math.cos( i + 1.26 * time * ( 1.03 + 0.5 * Math.cos( 0.21 * i ) ) ) * 0.27;
+				ballx = Math.cos(i + 1.26 * time * (1.03 + 0.5 * Math.cos(0.21 * i))) * 0.27;
 				bally = seed;
-				ballz = Math.cos( i + 1.32 * time * 0.1 * Math.sin( ( 0.92 + 0.53 * i ) ) ) * 0.27 + 0.5;
+				ballz = Math.cos(i + 1.32 * time * 0.1 * Math.sin((0.92 + 0.53 * i))) * 0.27 + 0.5;
 
 				//console.log(ballx)
 
-				object.addBall( ballx, bally, ballz, strength, subtract );
+				object.addBall(ballx, bally, ballz, strength, subtract);
 
 
 			}
 
-			if ( floor ) object.addPlaneY( 2, 12 );
+			if (floor) object.addPlaneY(2, 12);
 		}
 
 		//
 
 		function animate() {
 
-			requestAnimationFrame( animate );
+			requestAnimationFrame(animate);
 
 			render();
-			stats.update();
+			//stats.update();
 
 		}
 
@@ -161,29 +159,30 @@
 			var delta = clock.getDelta();
 
 			time = seed;
-			if(seed > .35){
+			if (seed > .35) {
 				seed = .2
 			}
-			else{
+			else {
 				seed = seed;
 			}
 
 			// marching cubes
 
-			updateCubes( effect, time, 30, true );
+			updateCubes(effect, time, 30, true);
 
 			// materials
-			effect.material.color.setHSL( 0, 0, 1.0 );
+			effect.material.color.setHSL(0, 0, 1.0);
 			// lights
 
 
 			// render
 
-			renderer.render( scene, camera );
+			renderer.render(scene, camera);
 
 		}
 
-</script>
+	</script>
 
 </body>
+
 </html>
